@@ -1,36 +1,44 @@
-import React, { useState, useEffect } from 'react'; // FIX: Menghapus 'useCallback' yang tidak terpakai
+import React, { useState, useEffect } from 'react';
 
 // --- PENGATURAN ---
 const SCRIPT_URL = process.env.REACT_APP_APPS_SCRIPT_URL;
-const ADMIN_PHONE_NUMBER = "6282196657271"; // Ganti dengan nomor WA admin
+const ADMIN_PHONE_NUMBER = "6282196657271";
+
+// --- KOMPONEN LOGO (Anda bisa memasukkan kode SVG logo Anda di sini) ---
+const BMLogo = () => (
+    <svg width="100" height="40" viewBox="0 0 100 40" className="mx-auto mb-4">
+        {/* Placeholder untuk logo BML. Ganti dengan kode SVG Anda. */}
+        <rect width="100" height="40" rx="8" fill="#00529B" />
+        <text x="50" y="25" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">BML</text>
+    </svg>
+);
+
 
 // --- KOMPONEN UTAMA (ROUTER) ---
 export default function App() {
-  const [page, setPage] = useState('login'); // Halaman default adalah login
-  const [user, setUser] = useState(null); // Menyimpan data pengguna yang login
+  const [page, setPage] = useState('login');
+  const [user, setUser] = useState(null);
 
-  // Cek apakah ada data user di local storage saat aplikasi dimuat
   useEffect(() => {
     const loggedInUser = localStorage.getItem('bmlUser');
     if (loggedInUser) {
       setUser(JSON.parse(loggedInUser));
-      setPage('selection'); // Langsung ke halaman pilihan jika sudah login
+      setPage('selection');
     }
   }, []);
 
   const handleLoginSuccess = (userData) => {
     setUser(userData);
-    localStorage.setItem('bmlUser', JSON.stringify(userData)); // Simpan data user
+    localStorage.setItem('bmlUser', JSON.stringify(userData));
     setPage('selection');
   };
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem('bmlUser'); // Hapus data user
+    localStorage.removeItem('bmlUser');
     setPage('login');
   };
 
-  // Logika untuk menampilkan halaman yang sesuai
   switch (page) {
     case 'selection':
       return <SelectionPage setPage={setPage} handleLogout={handleLogout} />;
@@ -46,6 +54,7 @@ export default function App() {
 
 // --- HALAMAN-HALAMAN APLIKASI ---
 
+// MODIFIKASI: Halaman Login di-styling ulang sesuai Figma
 function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -60,15 +69,10 @@ function LoginPage({ onLoginSuccess }) {
     try {
       const response = await fetch(SCRIPT_URL, {
         method: 'POST',
-        body: JSON.stringify({
-          action: 'login',
-          payload: { email, password }
-        }),
+        body: JSON.stringify({ action: 'login', payload: { email, password } }),
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       });
-
       const result = await response.json();
-
       if (result.success) {
         onLoginSuccess(result.user);
       } else {
@@ -86,48 +90,68 @@ function LoginPage({ onLoginSuccess }) {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white shadow-lg rounded-lg w-full max-w-sm">
-        <h1 className="text-2xl font-bold text-center mb-6">BML Marketing App</h1>
+    <div className="flex items-center justify-center min-h-screen bg-gray-50 font-sans">
+      <div className="p-8 bg-white shadow-xl rounded-2xl w-full max-w-md">
+        <BMLogo />
+        <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">Internal Marketing App</h2>
+        <p className="text-center text-gray-500 mb-8">Silakan masuk untuk melanjutkan</p>
+        
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Alamat Email</label>
-            <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="w-full p-2 border rounded" required />
+            <label className="block text-sm font-semibold text-gray-600 mb-1">Alamat Email</label>
+            <input 
+              type="email" 
+              value={email} 
+              onChange={(e) => setEmail(e.target.value)} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bml-blue" 
+              required 
+            />
           </div>
           <div className="mb-6">
-            <label className="block text-sm font-medium mb-1">Kata Sandi</label>
-            <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} className="w-full p-2 border rounded" required />
+            <label className="block text-sm font-semibold text-gray-600 mb-1">Kata Sandi</label>
+            <input 
+              type="password" 
+              value={password} 
+              onChange={(e) => setPassword(e.target.value)} 
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-bml-blue" 
+              required 
+            />
           </div>
           {error && <p className="text-red-500 text-sm text-center mb-4">{error}</p>}
-          <button type="submit" disabled={isLoading} className="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700 disabled:bg-blue-300">
+          <button 
+            type="submit" 
+            disabled={isLoading} 
+            className="w-full bg-bml-blue text-white py-3 rounded-lg font-semibold hover:bg-bml-blue-dark transition-colors disabled:bg-blue-300"
+          >
             {isLoading ? 'Loading...' : 'Masuk'}
           </button>
         </form>
-        <div className="text-center text-sm mt-4">
-          <button onClick={() => openWhatsApp('Halo Admin, saya lupa kata sandi saya.')} className="text-blue-600 hover:underline">Lupa Kata Sandi?</button>
-          <span className="mx-2">|</span>
-          <button onClick={() => openWhatsApp('Halo Admin, saya ingin mendaftar untuk aplikasi marketing.')} className="text-blue-600 hover:underline">Kontak Admin</button>
+        <div className="text-center text-sm mt-6">
+          <button onClick={() => openWhatsApp('Halo Admin, saya lupa kata sandi saya.')} className="text-bml-blue hover:underline">Lupa Kata Sandi?</button>
+          <span className="mx-2 text-gray-300">|</span>
+          <button onClick={() => openWhatsApp('Halo Admin, saya ingin mendaftar untuk aplikasi marketing.')} className="text-bml-blue hover:underline">Kontak Admin</button>
         </div>
       </div>
     </div>
   );
 }
 
+// (Sisa komponen di bawah ini tetap sama untuk saat ini)
 function SelectionPage({ setPage, handleLogout }) {
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
-      <h1 className="text-3xl font-bold mb-8">Pilih Halaman</h1>
-      <div className="flex gap-4">
-        <button onClick={() => setPage('dashboard')} className="px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600">
-          Dashboard
-        </button>
-        <button onClick={() => setPage('form')} className="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600">
-          Form
-        </button>
-      </div>
-      <button onClick={handleLogout} className="mt-8 text-sm text-gray-600 hover:underline">Keluar</button>
-    </div>
-  );
+    return (
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
+            <h1 className="text-3xl font-bold mb-8">Pilih Halaman</h1>
+            <div className="flex gap-4">
+                <button onClick={() => setPage('dashboard')} className="px-8 py-4 bg-green-500 text-white font-semibold rounded-lg shadow-md hover:bg-green-600">
+                    Dashboard
+                </button>
+                <button onClick={() => setPage('form')} className="px-8 py-4 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600">
+                    Form
+                </button>
+            </div>
+            <button onClick={handleLogout} className="mt-8 text-sm text-gray-600 hover:underline">Keluar</button>
+        </div>
+    );
 }
 
 function FormPage({ user, setPage, handleLogout }) {
@@ -135,7 +159,6 @@ function FormPage({ user, setPage, handleLogout }) {
   const [customerData, setCustomerData] = useState({});
   const [transactionData, setTransactionData] = useState({});
   const [projectData, setProjectData] = useState({});
-  
   const [projects, setProjects] = useState({});
   const [clusters, setClusters] = useState([]);
 
@@ -161,7 +184,6 @@ function FormPage({ user, setPage, handleLogout }) {
       ...projectData,
       nama_sales: user.nama_lengkap,
     };
-
     try {
       await fetch(SCRIPT_URL, {
         method: 'POST',
@@ -200,7 +222,7 @@ function FormPage({ user, setPage, handleLogout }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 p-4">
+    <div className="min-h-screen bg-gray-100 p-4 font-sans">
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-xl font-bold">Form Input Data Closing</h1>
@@ -214,7 +236,7 @@ function FormPage({ user, setPage, handleLogout }) {
 
 function DashboardPage({ setPage, handleLogout }) {
     return (
-        <div className="p-4">
+        <div className="p-4 font-sans">
             <h1 className="text-2xl font-bold">Dashboard</h1>
             <p>Data dashboard akan ditampilkan di sini.</p>
             <button onClick={() => alert('Fitur Unduh PDF akan dibuat.')} className="mt-4 px-4 py-2 bg-blue-500 text-white rounded">
@@ -228,14 +250,10 @@ function DashboardPage({ setPage, handleLogout }) {
     );
 }
 
-
-// --- KOMPONEN-KOMPONEN FORM ---
-
 function CustomerForm({ data, setData, nextStep }) {
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
   };
-
   const handleSubmit = (e) => {
       e.preventDefault();
       if(!data.nama_customer || !data.telepon_customer || !data.alamat_ktp || !data.pekerjaan) {
@@ -244,7 +262,6 @@ function CustomerForm({ data, setData, nextStep }) {
       }
       nextStep();
   }
-
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">Data Customer (Sesuai KTP)</h2>
@@ -262,7 +279,6 @@ function PaymentForm({ data, setData, nextStep, prevStep }) {
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if(!data.metode_pembayaran || (data.metode_pembayaran === 'Lainnya' && !data.metode_pembayaran_lainnya) || !data.nominal_transaksi) {
@@ -271,7 +287,6 @@ function PaymentForm({ data, setData, nextStep, prevStep }) {
         }
         nextStep();
     }
-
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="text-lg font-semibold mb-4">Data Transaksi - Pembayaran</h2>
@@ -297,7 +312,6 @@ function ProjectForm({ data, setData, nextStep, prevStep, projects, clusters, ha
     const handleChange = (e) => {
         setData({ ...data, [e.target.name]: e.target.value });
     };
-
     const handleSubmit = (e) => {
         e.preventDefault();
         if(!data.proyek || !data.cluster || !data.lb || !data.lt) {
@@ -306,7 +320,6 @@ function ProjectForm({ data, setData, nextStep, prevStep, projects, clusters, ha
         }
         nextStep();
     }
-
     return (
         <form onSubmit={handleSubmit}>
             <h2 className="text-lg font-semibold mb-4">Data Transaksi - Proyek</h2>
