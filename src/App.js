@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react'; // FIX: Menghapus 'useCallback' yang tidak terpakai
 
 // --- PENGATURAN ---
 const SCRIPT_URL = process.env.REACT_APP_APPS_SCRIPT_URL;
@@ -131,17 +131,14 @@ function SelectionPage({ setPage, handleLogout }) {
 }
 
 function FormPage({ user, setPage, handleLogout }) {
-  // State untuk setiap langkah form
   const [step, setStep] = useState(1);
   const [customerData, setCustomerData] = useState({});
   const [transactionData, setTransactionData] = useState({});
   const [projectData, setProjectData] = useState({});
   
-  // State untuk dropdown dinamis
   const [projects, setProjects] = useState({});
   const [clusters, setClusters] = useState([]);
 
-  // Ambil data proyek & cluster saat komponen dimuat
   useEffect(() => {
     fetch(`${SCRIPT_URL}?action=getProjects`)
       .then(res => res.json())
@@ -171,7 +168,7 @@ function FormPage({ user, setPage, handleLogout }) {
         body: JSON.stringify({ action: 'addClosing', payload: finalData }),
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
       });
-      setStep('success'); // Pindah ke halaman sukses
+      setStep('success');
     } catch (err) {
       console.error("Error saving data:", err);
       alert("Gagal menyimpan data.");
@@ -185,7 +182,6 @@ function FormPage({ user, setPage, handleLogout }) {
     setStep(1);
   };
   
-  // Render komponen form berdasarkan langkah saat ini
   const renderStep = () => {
     switch(step) {
       case 1:
@@ -217,7 +213,6 @@ function FormPage({ user, setPage, handleLogout }) {
 }
 
 function DashboardPage({ setPage, handleLogout }) {
-    // Logika untuk mengambil dan menampilkan data dashboard
     return (
         <div className="p-4">
             <h1 className="text-2xl font-bold">Dashboard</h1>
@@ -243,9 +238,8 @@ function CustomerForm({ data, setData, nextStep }) {
 
   const handleSubmit = (e) => {
       e.preventDefault();
-      // Validasi sederhana
-      if(Object.values(data).length < 5) {
-          alert("Harap isi semua kolom.");
+      if(!data.nama_customer || !data.telepon_customer || !data.alamat_ktp || !data.pekerjaan) {
+          alert("Harap isi semua kolom wajib.");
           return;
       }
       nextStep();
@@ -254,7 +248,6 @@ function CustomerForm({ data, setData, nextStep }) {
   return (
     <form onSubmit={handleSubmit}>
       <h2 className="text-lg font-semibold mb-4">Data Customer (Sesuai KTP)</h2>
-      {/* Input fields untuk data customer */}
       <input name="nama_customer" value={data.nama_customer || ''} onChange={handleChange} placeholder="Nama Customer" className="w-full p-2 border rounded mb-2" required />
       <input name="telepon_customer" value={data.telepon_customer || ''} onChange={handleChange} placeholder="Nomor Telepon" className="w-full p-2 border rounded mb-2" required />
       <input name="alamat_ktp" value={data.alamat_ktp || ''} onChange={handleChange} placeholder="Alamat Sesuai KTP" className="w-full p-2 border rounded mb-2" required />
@@ -272,7 +265,7 @@ function PaymentForm({ data, setData, nextStep, prevStep }) {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if(!data.metode_pembayaran || !data.nominal_transaksi) {
+        if(!data.metode_pembayaran || (data.metode_pembayaran === 'Lainnya' && !data.metode_pembayaran_lainnya) || !data.nominal_transaksi) {
             alert("Harap isi semua kolom.");
             return;
         }
@@ -289,7 +282,7 @@ function PaymentForm({ data, setData, nextStep, prevStep }) {
                 <option value="Lainnya">Lainnya</option>
             </select>
             {data.metode_pembayaran === 'Lainnya' && (
-                <input name="metode_pembayaran_lainnya" onChange={handleChange} placeholder="Sebutkan Metode Lainnya" className="w-full p-2 border rounded mb-2" required />
+                <input name="metode_pembayaran_lainnya" value={data.metode_pembayaran_lainnya || ''} onChange={handleChange} placeholder="Sebutkan Metode Lainnya" className="w-full p-2 border rounded mb-2" required />
             )}
             <input name="nominal_transaksi" type="number" value={data.nominal_transaksi || ''} onChange={handleChange} placeholder="Nominal Transaksi" className="w-full p-2 border rounded mb-4" required />
             <div className="flex justify-between">
@@ -346,7 +339,7 @@ function RecapPage({ data, handleSave, prevStep }) {
             <h2 className="text-lg font-semibold mb-4">Rekap Data</h2>
             <div className="space-y-2 bg-gray-50 p-4 rounded">
                 {Object.entries(data).map(([key, value]) => (
-                    <p key={key}><strong className="capitalize">{key.replace('_', ' ')}:</strong> {value}</p>
+                    <p key={key}><strong className="capitalize">{key.replace(/_/g, ' ')}:</strong> {value}</p>
                 ))}
             </div>
             <div className="flex justify-between mt-4">
