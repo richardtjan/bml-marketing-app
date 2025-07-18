@@ -1,18 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { BMLogo } from './components/BMLogo'; // <-- IMPORT LOGO DARI FILE BARU
 
 // --- PENGATURAN ---
 const SCRIPT_URL = process.env.REACT_APP_APPS_SCRIPT_URL;
 const ADMIN_PHONE_NUMBER = "6282196657271";
-
-// --- KOMPONEN LOGO (Anda bisa memasukkan kode SVG logo Anda di sini) ---
-const BMLogo = () => (
-    <svg width="100" height="40" viewBox="0 0 100 40" className="mx-auto mb-4">
-        {/* Placeholder untuk logo BML. Ganti dengan kode SVG Anda. */}
-        <rect width="100" height="40" rx="8" fill="#00529B" />
-        <text x="50" y="25" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">BML</text>
-    </svg>
-);
-
 
 // --- KOMPONEN UTAMA (ROUTER) ---
 export default function App() {
@@ -54,7 +45,6 @@ export default function App() {
 
 // --- HALAMAN-HALAMAN APLIKASI ---
 
-// MODIFIKASI: Halaman Login di-styling ulang sesuai Figma
 function LoginPage({ onLoginSuccess }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -136,7 +126,6 @@ function LoginPage({ onLoginSuccess }) {
   );
 }
 
-// (Sisa komponen di bawah ini tetap sama untuk saat ini)
 function SelectionPage({ setPage, handleLogout }) {
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4">
