@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BMLogo } from './components/BMLogo'; // <-- IMPORT LOGO DARI FILE BARU
+import { BMLogo } from './components/BMLogo';
 
 // --- PENGATURAN ---
 const SCRIPT_URL = process.env.REACT_APP_APPS_SCRIPT_URL;
